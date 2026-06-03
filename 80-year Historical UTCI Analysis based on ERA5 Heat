@@ -1,0 +1,104 @@
+/** 
+ * PHILIPPINES 80-YEAR HISTORICAL HEAT ANALYSIS (1940-2020)
+ * Includes 1940-2020 UTCI Hotspots & 2000-2020 Exposure
+ */
+
+// 1. Define the Philippines region
+var region = ee.FeatureCollection('USDOS/LSIB_SIMPLE/2017')
+  .filter(ee.Filter.eq('country_na', 'Philippines'));
+
+// 2. Load Datasets
+var era5_heat_ic = ee.ImageCollection('projects/climate-engine-pro/assets/ce-era5-heat');
+var worldPop = ee.ImageCollection("WorldPop/GP/100m/pop");
+
+// 3. Parameters
+var threshold = 32 + 273.15; // 32°C Strong Heat Stress
+var historicalYears = ee.List.sequence(1940, 2020, 10).getInfo(); 
+var utci_palette = ["#ffffcc", "#ffeda0", "#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#bd0026", "#800026"];
+
+// Variables to store comparison maps
+var utci1940, utci2020;
+
+// 4. Analysis Loop
+var longTermStats = historicalYears.map(function(year) {
+  var startDate = ee.Date.fromYMD(year, 3, 1);
+  var endDate = ee.Date.fromYMD(year, 6, 1); 
+  
+  var summerCol = era5_heat_ic.filterBounds(region).filterDate(startDate, endDate);
+  var summerMaxBand = summerCol.select('utci_max');
+  
+  // A. Temperature Intensity
+  var avgMaxUtci = summerMaxBand.mean().subtract(273.15).clip(region);
+  var heatDays = summerMaxBand.map(function(img) { 
+    return img.gt(threshold); 
+  }).reduce(ee.Reducer.sum()).rename('count_days');
+
+  // Store milestones for hotspot analysis
+  if (year === 1940) { utci1940 = avgMaxUtci; }
+  if (year === 2020) { utci2020 = avgMaxUtci; }
+
+  // B. Exposure Calculation (2000+ only)
+  var exposureMap = ee.Image(0).rename('person_days');
+  var hasPop = year >= 2000;
+  
+  if (hasPop) {
+    var pop = worldPop.filter(ee.Filter.calendarRange(year, year, 'year'))
+      .select('population').mosaic().clip(region);
+    exposureMap = heatDays.multiply(pop).rename('person_days');
+  }
+
+  // C. Regional Reduction (Statistics)
+  var stats = summerMaxBand.reduce(ee.Reducer.mean().combine(ee.Reducer.max(), '', true))
+    .subtract(273.15).reduceRegion({
+      reducer: ee.Reducer.mean(), geometry: region, scale: 5000, maxPixels: 1e9
+  });
+  
+  var daysCount = heatDays.reduceRegion({
+    reducer: ee.Reducer.mean(), geometry: region, scale: 5000
+  });
+
+  print('--- Year: ' + year + ' ---', {
+    'Avg Summer Max UTCI (°C)': stats.get('utci_max_mean'),
+    'Peak UTCI Recorded (°C)': stats.get('utci_max_max'),
+    'Days over 32°C': daysCount.get('count_days')
+  });
+
+  return ee.Feature(null, {
+    'year': year,
+    'avg_temp': stats.get('utci_max_mean'),
+    'exposure': hasPop ? exposureMap.reduceRegion({reducer: ee.Reducer.sum(), geometry: region, scale: 1000}).get('person_days') : null
+  });
+});
+
+// 5. 80-YEAR HOTSPOT ANALYSIS (2020 - 1940)
+var utciDiff = utci2020.subtract(utci1940);
+Map.addLayer(utciDiff, {min: 0, max: 4, palette: ['white', 'yellow', 'orange', 'red', 'darkred']}, 'HOTSPOTS: UTCI Increase (1940-2020)');
+
+var totalWarming = utciDiff.reduceRegion({reducer: ee.Reducer.mean(), geometry: region, scale: 5000});
+print('--- 80-YEAR CLIMATE SUMMARY ---', {
+  'Net Average Warming since 1940 (°C)': totalWarming.get('utci_max')
+});
+
+// 6. Charts
+var chartFeatures = ee.FeatureCollection(longTermStats);
+
+// Temperature Chart (1940-2020)
+print(ui.Chart.feature.byFeature(chartFeatures, 'year', 'avg_temp')
+  .setOptions({
+    title: 'Philippines Summer Temperature Trend (1940-2020)',
+    vAxis: {title: 'Avg Max UTCI (°C)'},
+    hAxis: {format: '####'},
+    colors: ['#e6550d'],
+    trendlines: {0: {color: 'black', lineWidth: 1}}
+  }));
+
+// Exposure Chart (2000-2020)
+print(ui.Chart.feature.byFeature(chartFeatures.filter(ee.Filter.notNull(['exposure'])), 'year', 'exposure')
+  .setOptions({
+    title: 'Total Person-Days Exposure (2000-2020)',
+    vAxis: {title: 'Person-Days'},
+    hAxis: {format: '####'},
+    colors: ['#d73027']
+  }));
+
+Map.centerObject(region, 6);

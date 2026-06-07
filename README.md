@@ -1,4 +1,5 @@
 A set of modular Google Earth Engine-based workflow that analyzes changes in UTCI using the ERA5 Heat dataset. The code was initially developed for the Philippines, but the overall workflow is easily scalable and transferable to other countries using the US Department of State (USDOS) Large-Scale International Boundary. All these datasets can be accessed directly from GEE.
 
 **I. Description**
+
 Rapidly increasing heat stress exposure is a growing urban issue worldwide. Rapid demographic growth in conjunction with global warming trends further exacerbates heat stress concerns, especially in low-income countries, such as the Philippines. Given the pressing challenges with heat stress exposure, combined with the converging demographic and climate change dilemma, warrant heat stress risk analysis at resolutions relevant for local planning.

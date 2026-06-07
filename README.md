@@ -22,3 +22,6 @@ The methodology modules are composed of the following procedures:
 
 **III. Analytics Feature and Key Insights**
 
+**Temporal Trend:** By applying a spatial reduction method directly to the ERA5 Heat dataset, the script dynamically plots a decadal trendline of UTCI since 1940. This visualization tracks how the average number of summer days surpassing the 32°C UTCI baseline has changed.
+
+**Spatial Visualization:** Beyond the descriptive statistical test, this coding workflow also includes a visualization aspect that individually maps and stacks nine historical UTCI maps to demonstrate areas of heat stress intensification.

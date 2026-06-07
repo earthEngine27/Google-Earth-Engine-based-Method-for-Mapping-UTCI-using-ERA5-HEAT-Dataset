@@ -3,3 +3,5 @@ A set of modular Google Earth Engine-based workflow that analyzes changes in UTC
 **I. Description**
 
 Rapidly increasing heat stress exposure is a growing urban issue worldwide. Rapid demographic growth in conjunction with global warming trends further exacerbates heat stress concerns, especially in low-income countries, such as the Philippines. Given the pressing challenges with heat stress exposure, combined with the converging demographic and climate change dilemma, warrant heat stress risk analysis at resolutions relevant for local planning.
+
+Traditional heat stress analysis relies solely on ambient air temperature, but over-reliance on temperature alone dismisses other important mechanisms of heat transfer and thermoregulation. Both of which collectively influence heat stress. Using ERA5-Heat datasets wrangled and analyzed via Google Earth Engine, this analysis extracts and maps the temporal trend of UTCI in the Philippines across 10-year intervals from 1940 to 2020.

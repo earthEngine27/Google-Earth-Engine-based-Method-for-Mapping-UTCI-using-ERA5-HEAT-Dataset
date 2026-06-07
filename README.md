@@ -26,6 +26,7 @@ The methodology modules are composed of the following procedures:
 
 **Spatial Visualization:** Beyond the descriptive statistical test, this coding workflow also includes a visualization aspect that individually maps and stacks nine historical UTCI maps to demonstrate areas of heat stress intensification.
 
-<img width="652" height="446" alt="UTCI_2020" src="https://github.com/user-attachments/assets/87243d21-24b2-4a78-9270-e189092d1f71" />
-<img width="650" height="446" alt="UTCI_1940" src="https://github.com/user-attachments/assets/7bd1ed77-288c-46d2-9885-cf31188db734" />
+<img width="1240" height="612" alt="UTCI_Trend_1940-2020" src="https://github.com/user-attachments/assets/a3d7adb2-5108-449d-a451-756025818faa" />
+<img width="1920" height="1080" alt="UTCI Comparison" src="https://github.com/user-attachments/assets/ff7b65ea-6fcf-4d4b-a770-430d3634e4b1" />
+
 
